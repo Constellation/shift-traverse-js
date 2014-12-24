@@ -22,6 +22,7 @@ npm install shift-traverse
 
 ## Usage
 
+### traverse
 ```js
 // In ES6, but you can use it under ES5 environment.
 import {traverse} from "shift-traverse"
@@ -35,6 +36,30 @@ traverse(tree, {
         console.log(`leaving ${node.type}`);
     }
 });
+```
+
+### replace
+
+```js
+import parse from 'shift-parser'
+import codegen from "shift-codegen";
+import { LiteralStringExpression } from "shift-ast";
+import { replace, Syntax } from '../'
+
+let code = `
+function test() {
+    console.log("HELLO WORLD");
+}
+`;
+let tree = parse(code);
+let transformed = replace(tree, {
+    enter(node, parent) {
+        if (node.type === Syntax.LiteralStringExpression) {
+            return new LiteralStringExpression('ご注文はうさぎですか？');
+        }
+    }
+});
+assert(codegen(transformed) === `function test(){console.log("ご注文はうさぎですか？")}`);
 ```
 
 ### License
