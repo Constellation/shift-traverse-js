@@ -1,0 +1,55 @@
+{
+  "name": "shift-traverse",
+  "version": "1.0.0-dev",
+  "description": "traversal functionality for the Shift AST format",
+  "author": "Yusuke SUZUKI",
+  "homepage": "https://github.com/Constellation/shift-traverse-js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Constellation/shift-traverse-js.git"
+  },
+  "main": "lib/index.js",
+  "maintainers": [
+    {
+      "name": "Yusuke SUZUKI",
+      "email": "utatane.tea@gmail.com",
+      "web": "http://github.com/Constellation"
+    }
+  ],
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "gulp test"
+  },
+  "dependencies": {
+    "estraverse": "^1.9.0",
+    "object-assign": "^2.0.0",
+    "require-uncached": "^1.0.2"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-6to5": "^1.0.2",
+    "gulp-espower": "^0.10.0",
+    "gulp-mocha": "^2.0.0",
+    "power-assert": "^0.10.0",
+    "shift-parser": "^1.0.0"
+  },
+  "keywords": [
+    "Shift",
+    "AST",
+    "traversal",
+    "abstract",
+    "syntax",
+    "tree"
+  ],
+  "bugs": {
+    "url": "https://github.com/Constellation/shift-traverse-js/issues"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "http://github.com/Constellation/shift-traverse-js/raw/master/LICENSE.BSD"
+    }
+  ]
+}
