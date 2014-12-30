@@ -27,7 +27,12 @@
 var gulp = require('gulp'),
     mocha = require('gulp-mocha'),
     to5 = require('gulp-6to5'),
-    espower = require('gulp-espower');
+    espower = require('gulp-espower'),
+    git = require('gulp-git'),
+    bump = require('gulp-bump'),
+    filter = require('gulp-filter'),
+    tagVersion = require('gulp-tag-version'),
+    sourcemaps = require('gulp-sourcemaps');
 
 var TEST = [ 'test/*.js' ];
 var POWERED = [ 'powered-test/*.js' ];
@@ -35,14 +40,18 @@ var SOURCE = [ 'src/**/*.js' ];
 
 gulp.task('build', function () {
     return gulp.src(SOURCE)
+        .pipe(sourcemaps.init())
         .pipe(to5())
+        .pipe(sourcemaps.write())
         .pipe(gulp.dest('lib'));
 });
 
 gulp.task('powered-test', function () {
     return gulp.src(TEST)
+        .pipe(sourcemaps.init())
         .pipe(to5())
         .pipe(espower())
+        .pipe(sourcemaps.write())
         .pipe(gulp.dest('./powered-test/'));
 });
 
@@ -57,6 +66,39 @@ gulp.task('test', [ 'build', 'powered-test' ], function () {
 gulp.task('watch', [ 'build' ], function () {
     gulp.watch(SOURCE, [ 'build' ]);
 });
+
+/**
+ * Bumping version number and tagging the repository with it.
+ * Please read http://semver.org/
+ *
+ * You can use the commands
+ *
+ *     gulp patch     # makes v0.1.0 -> v0.1.1
+ *     gulp feature   # makes v0.1.1 -> v0.2.0
+ *     gulp release   # makes v0.2.1 -> v1.0.0
+ *
+ * To bump the version numbers accordingly after you did a patch,
+ * introduced a feature or made a backwards-incompatible release.
+ */
+
+function inc(importance) {
+    // get all the files to bump version in
+    return gulp.src(['./package.json'])
+        // bump the version number in those files
+        .pipe(bump({type: importance}))
+        // save it back to filesystem
+        .pipe(gulp.dest('./'))
+        // commit the changed version number
+        .pipe(git.commit('Bumps package version'))
+        // read only one file to get the version number
+        .pipe(filter('package.json'))
+        // **tag it in the repository**
+        .pipe(tagVersion());
+}
+
+gulp.task('patch', [ 'build' ], function () { return inc('patch'); })
+gulp.task('minor', [ 'build' ], function () { return inc('minor'); })
+gulp.task('major', [ 'build' ], function () { return inc('major'); })
 
 gulp.task('travis', [ 'test' ]);
 gulp.task('default', [ 'travis' ]);
