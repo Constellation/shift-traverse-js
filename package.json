@@ -1,6 +1,6 @@
 {
   "name": "shift-traverse",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "traversal functionality for the Shift AST format",
   "author": "Yusuke SUZUKI",
   "homepage": "https://github.com/Constellation/shift-traverse-js",
