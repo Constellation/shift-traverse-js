@@ -23,9 +23,8 @@
     "test": "gulp test"
   },
   "dependencies": {
-    "estraverse": "^1.9.0",
-    "object-assign": "^2.0.0",
-    "require-uncached": "^1.0.2"
+    "estraverse": "^1.9.1",
+    "object-assign": "^2.0.0"
   },
   "devDependencies": {
     "gulp": "^3.8.10",

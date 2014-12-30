@@ -24,14 +24,10 @@
 
 import Spec from './spec.js'
 import * as objectAssign from 'object-assign'
-import * as requireUncached from 'require-uncached'
 import { version } from '../package.json'
 
 // Loading uncached estraverse for changing estraverse.Syntax.
-const estraverse = requireUncached('estraverse');
-if (false  /* for browserify */) {
-    require('estraverse');
-}
+const estraverse = require('estraverse').cloneEnvironment();
 
 // Adjust estraverse members.
 
