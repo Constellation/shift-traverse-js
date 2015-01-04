@@ -32,18 +32,26 @@ var gulp = require('gulp'),
     bump = require('gulp-bump'),
     filter = require('gulp-filter'),
     tagVersion = require('gulp-tag-version'),
-    sourcemaps = require('gulp-sourcemaps');
+    sourcemaps = require('gulp-sourcemaps'),
+    plumber = require('gulp-plumber'),
+    lazypipe = require('lazypipe');
 
 var TEST = [ 'test/*.js' ];
 var POWERED = [ 'powered-test/*.js' ];
 var SOURCE = [ 'src/**/*.js' ];
 
+var build = lazypipe()
+    .pipe(sourcemaps.init)
+    .pipe(to5)
+    .pipe(sourcemaps.write)
+    .pipe(gulp.dest, 'lib');
+
+gulp.task('build-for-watch', function () {
+    return gulp.src(SOURCE).pipe(plumber()).pipe(build());
+});
+
 gulp.task('build', function () {
-    return gulp.src(SOURCE)
-        .pipe(sourcemaps.init())
-        .pipe(to5())
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest('lib'));
+    return gulp.src(SOURCE).pipe(build());
 });
 
 gulp.task('powered-test', function () {
@@ -63,8 +71,8 @@ gulp.task('test', [ 'build', 'powered-test' ], function () {
         }));
 });
 
-gulp.task('watch', [ 'build' ], function () {
-    gulp.watch(SOURCE, [ 'build' ]);
+gulp.task('watch', [ 'build-for-watch' ], function () {
+    gulp.watch(SOURCE, [ 'build-for-watch' ]);
 });
 
 /**
