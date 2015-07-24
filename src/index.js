@@ -22,7 +22,7 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import Spec from './spec.js'
+import Spec from 'shift-spec'
 import * as objectAssign from 'object-assign'
 import { version } from '../package.json'
 
@@ -31,7 +31,7 @@ const estraverse = require('estraverse').cloneEnvironment();
 
 // Adjust estraverse members.
 
-Object.keys(estraverse.Syntax).forEach((key) => {
+Object.keys(estraverse.Syntax).filter(key => key !== 'Property').forEach((key) => {
     delete estraverse.Syntax[key];
     delete estraverse.VisitorKeys[key];
 });
@@ -41,7 +41,10 @@ objectAssign(estraverse.Syntax, Object.keys(Spec).reduce((result, key) => {
     return result;
 }, {}));
 
-objectAssign(estraverse.VisitorKeys, Spec);
+objectAssign(estraverse.VisitorKeys, Object.keys(Spec).reduce((result, key) => {
+    result[key] = Spec[key].fields.map(field => field.name);
+    return result;
+}, {}));
 
 estraverse.version = version;
 module.exports = estraverse;

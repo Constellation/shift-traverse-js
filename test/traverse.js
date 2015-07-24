@@ -22,8 +22,9 @@
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+import * as fs from 'fs'
 import * as assert from 'power-assert'
-import parse from 'shift-parser'
+import { parseScript, parseModule } from 'shift-parser'
 import { traverse } from '../'
 
 describe('traverse', () => {
@@ -33,7 +34,7 @@ describe('traverse', () => {
             console.log("HELLO WORLD");
         }
         `;
-        let tree = parse(code);
+        let tree = parseScript(code);
         let result = [];
         traverse(tree, {
             enter(node) {
@@ -42,16 +43,14 @@ describe('traverse', () => {
         });
         assert.deepEqual(result, [
             'Script',
-            'FunctionBody',
             'FunctionDeclaration',
-            'Identifier',
+            'BindingIdentifier',
+            'FormalParameters',
             'FunctionBody',
             'ExpressionStatement',
             'CallExpression',
             'StaticMemberExpression',
             'IdentifierExpression',
-            'Identifier',
-            'Identifier',
             'LiteralStringExpression'
         ]);
     });
@@ -62,7 +61,7 @@ describe('traverse', () => {
             console.log("HELLO WORLD");
         }
         `;
-        let tree = parse(code);
+        let tree = parseScript(code);
         let result = [];
         traverse(tree, {
             leave(node) {
@@ -70,17 +69,15 @@ describe('traverse', () => {
             }
         });
         assert.deepEqual(result, [
-            'Identifier',
-            'Identifier',
+            'BindingIdentifier',
+            'FormalParameters',
             'IdentifierExpression',
-            'Identifier',
             'StaticMemberExpression',
             'LiteralStringExpression',
             'CallExpression',
             'ExpressionStatement',
             'FunctionBody',
             'FunctionDeclaration',
-            'FunctionBody',
             'Script'
         ]);
     });
@@ -91,7 +88,7 @@ describe('traverse', () => {
             console.log("HELLO WORLD");
         }
         `;
-        let tree = parse(code);
+        let tree = parseScript(code);
         let result = [];
         traverse(tree, {
             enter(node) {
@@ -104,20 +101,17 @@ describe('traverse', () => {
         });
         assert.deepEqual(result, [
             'enter:Script',
-            'enter:FunctionBody',
             'enter:FunctionDeclaration',
-            'enter:Identifier',
-            'leave:Identifier',
+            'enter:BindingIdentifier',
+            'leave:BindingIdentifier',
+            'enter:FormalParameters',
+            'leave:FormalParameters',
             'enter:FunctionBody',
             'enter:ExpressionStatement',
             'enter:CallExpression',
             'enter:StaticMemberExpression',
             'enter:IdentifierExpression',
-            'enter:Identifier',
-            'leave:Identifier',
             'leave:IdentifierExpression',
-            'enter:Identifier',
-            'leave:Identifier',
             'leave:StaticMemberExpression',
             'enter:LiteralStringExpression',
             'leave:LiteralStringExpression',
@@ -125,10 +119,35 @@ describe('traverse', () => {
             'leave:ExpressionStatement',
             'leave:FunctionBody',
             'leave:FunctionDeclaration',
-            'leave:FunctionBody',
             'leave:Script'
         ]);
     });
-})
+
+    it('should traverse es2015 modules', () => {
+        let code = fs.readFileSync(require.resolve('everything.js/es2015-module'));
+        let tree = parseModule(code.toString());
+        let result = [];
+
+        traverse(tree, {
+            enter(node) {
+                result.push(node.type);
+            }
+        });
+        assert(result.length === 1772);
+    });
+
+    it('should traverse es2015 scripts', () => {
+        let code = fs.readFileSync(require.resolve('everything.js/es2015-script'));
+        let tree = parseScript(code.toString());
+        let result = [];
+        traverse(tree, {
+            enter(node) {
+                result.push(node.type);
+            }
+        });
+        assert(result.length === 1697);
+    });
+
+});
 
 /* vim: set sw=4 ts=4 et tw=80 : */
